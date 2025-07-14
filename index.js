@@ -19,11 +19,27 @@ app.get('/', (req, res) => {
 
 // Utility to send Telegram message
 async function sendTelegramMessage(text) {
-  return axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
-    chat_id: process.env.CHAT_ID,
-    text,
-  });
+  const bots = [
+    {
+      token: process.env.BOT1_TOKEN,
+      chatId: process.env.CHAT_ID1,
+    },
+    {
+      token: process.env.BOT2_TOKEN,
+      chatId: process.env.CHAT_ID2,
+    }
+  ];
+
+  const sendPromises = bots.map(({ token, chatId }) =>
+    axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
+      chat_id: chatId,
+      text,
+    })
+  );
+
+  await Promise.all(sendPromises); // Wait for all messages to be sent
 }
+
 
 // Routes
 
