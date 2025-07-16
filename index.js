@@ -30,16 +30,20 @@ async function sendTelegramMessage(text) {
     }
   ];
 
-  const sendPromises = bots.map(({ token, chatId }) =>
-    axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
-      chat_id: chatId,
-      text,
-    })
-  );
+  const sendPromises = bots.map(async ({ token, chatId }, index) => {
+    try {
+      console.log(`Sending to Bot ${index + 1}: Chat ID = ${chatId}`);
+      await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
+        chat_id: chatId,
+        text,
+      });
+    } catch (err) {
+      console.error(`Failed to send to Bot ${index + 1}:`, err.response?.data || err.message);
+    }
+  });
 
-  await Promise.all(sendPromises); // Wait for all messages to be sent
+  await Promise.all(sendPromises);
 }
-
 
 // Routes
 
@@ -56,8 +60,7 @@ app.post('/sendToTelegram', async (req, res, next) => {
 
   try {
     await sendTelegramMessage(message);
-    console.log('Telegram Token:', process.env.TELEGRAM_TOKEN?.slice(0,10) + '...');
-    console.log('Chat ID:', process.env.CHAT_ID);
+  
 
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json({ success: true, message: "Message sent to Telegram" });
